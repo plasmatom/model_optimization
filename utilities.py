@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import PIL
 import tqdm
 import torch
 from torchvision import datasets, transforms
@@ -24,6 +25,20 @@ transform_val = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=mean, std=std),
 ])
+
+
+def load_image(image_file):
+    image = PIL.Image.open(image_file)
+    image = np.array(image) / 255
+    image = image.transpose((2, 0, 1))
+    for i in range(3):
+        image[i] /= utils.mean[i]
+        image[i] -= utils.std[i]
+    image = torch.from_numpy(image)
+    image = transforms.functional.resize(image,(utils.image_size, utils.image_size))
+    image = image.to(torch.float32)
+    image = image.unsqueeze(0)
+    return image
 
 
 def test_network(model, test_loader, score_funcs=None, device="cpu"):
