@@ -1,7 +1,10 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import tqdm
 import torch
-from torchvision import datasets
+from torchvision import datasets, transforms
+
+image_size = 128
 
 mean = [0.48825347423553467, 0.45504486560821533, 0.4168395400047302]
 std = [0.2225690633058548, 0.21782387793064117, 0.218031108379364]
@@ -13,13 +16,13 @@ transform_train = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05),
     transforms.RandomAutocontrast(),
     transforms.ToTensor(),
-    transforms.Normalize(mean=mean.tolist(), std=std.tolist()),
+    transforms.Normalize(mean=mean, std=std),
 ])
 
 transform_val = transforms.Compose([
     transforms.Resize((image_size, image_size)),
     transforms.ToTensor(),
-    transforms.Normalize(mean=mean.tolist(), std=std.tolist()),
+    transforms.Normalize(mean=mean, std=std),
 ])
 
 
@@ -141,7 +144,7 @@ def train_network(
                                   'state_dict': model.state_dict(),
                                   'optimizer' : optimizer.state_dict()}
 
-                    torch.save(checkpoint, 'checkpoint.pth')
+                    torch.save(checkpoint, checkpoint_file)
                     print("Model checkpoint saved.")
             else:
                 num_bad_epochs += 1
